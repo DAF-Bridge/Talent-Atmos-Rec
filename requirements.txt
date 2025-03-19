@@ -12,9 +12,6 @@ transformers
 scipy
 httpx
 requests
-joblib
-openai
-psycopg2
 python-decouple
 python-dotenv
 supabase
