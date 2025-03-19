@@ -1,0 +1,27 @@
+# Ignore log files and directories
+logs
+*.log
+
+# Ignore temporary files/macOS system files
+.DS_Store
+Thumbs.db
+
+# Ignore Git files
+.git
+.gitignore
+
+# Ignore build artifacts
+dist
+build
+
+# Ignore local environment configuration files
+.env
+
+# Ignore any other files you don't want in your Docker image
+/.idea
+LICENSE
+README.md
+
+mf_model.pth
+
+Recommendation Model.ipynb
