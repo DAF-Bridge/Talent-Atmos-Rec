@@ -2,8 +2,13 @@ name: Build and Push Docker Image to GHCR
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - Dockerfile
+      - requirements.txt
+      - '**/*.py'
+  pull_request:
+    branches: [main]
     paths:
       - Dockerfile
       - requirements.txt
