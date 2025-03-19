@@ -35,13 +35,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Set repository tag in lowercase
+        run: echo "REPO_TAG=ghcr.io/$(echo ${GITHUB_REPOSITORY} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'):latest
+          tags: ${{ env.REPO_TAG }}:latest
           platforms: ${{ matrix.architecture }}
           
       - name: Image pushed
