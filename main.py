@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
-import connectToDatabase
+# import connectToDatabase
 import requests
 import httpx
 import pandas as pd
@@ -154,10 +154,10 @@ async def get_recommendations(user: UserRequest):
 def root():
     return {"message": "Event Recommendation API is running!"}
 
-if __name__ == "__main__":
-    conn = connectToDatabase.get_connection()
-    cur = conn.cursor()
+# if __name__ == "__main__":
+#     conn = connectToDatabase.get_connection()
+#     cur = conn.cursor()
 
-    cur.execute("SELECT version();")
-    db_version = cur.fetchone()
-    print(f"Connected to database version: {db_version}")
+#     cur.execute("SELECT version();")
+#     db_version = cur.fetchone()
+#     print(f"Connected to database version: {db_version}")
