@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 # import connectToDatabase
+import os
 import requests
 import httpx
 import pandas as pd
@@ -65,8 +66,8 @@ async def fetch_data(url: str):
 async def prepare_data():
     global users_new_df, events_train_df, user_map, event_map, num_users, num_events, model
 
-    user_url = "http://localhost:8080/users/user-preference/list"
-    event_url = "http://localhost:8080/users/event-preference/list"
+    user_url = os.environ.get("EXTERNAL_URL") + "/users/user-preference/list"
+    event_url = os.environ.get("EXTERNAL_URL") + "/users/event-preference/list"
 
     user_data = await fetch_data(user_url)
     event_data = await fetch_data(event_url)
