@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 class NCFModel(nn.Module):
     def __init__(self, num_users, num_events, embedding_dim):
         super(NCFModel, self).__init__()
+        self.P = nn.Embedding(num_users, embedding_dim)
         self.user_emb = nn.Embedding(num_users, embedding_dim)
+        self.Q = nn.Embedding(num_events, embedding_dim)
         self.event_emb = nn.Embedding(num_events, embedding_dim)
 
         self.mlp = nn.Sequential(
@@ -28,14 +30,24 @@ class NCFModel(nn.Module):
             nn.ReLU(),
             nn.Linear(64, 32),
             nn.ReLU(),
-            nn.Linear(32, 1)
+            nn.Linear(32, embedding_dim)
         )
-    
+
+        self.prediction_layer = nn.Linear(embedding_dim * 2, 1)
+        self.sigmoid = nn.Sigmoid()
+
     def forward(self, user_ids, event_ids):
-        user_vecs = self.user_emb(user_ids)
-        event_vecs = self.event_emb(event_ids)
-        x = torch.cat([user_vecs, event_vecs], dim=1)
-        return self.mlp(x).squeeze(1)
+        user_vecs = self.P(user_ids)
+        event_vecs = self.Q(event_ids)
+        gmf = user_vecs * event_vecs
+
+        p_mlp = self.user_emb(user_ids)
+        q_mlp = self.event_emb(event_ids)
+        mlp = self.mlp(torch.cat([p_mlp, q_mlp], dim=1))
+
+        x = torch.cat([gmf, mlp], dim=1)
+        out = self.prediction_layer(x)
+        return self.sigmoid(out).squeeze(1)
 
 app = FastAPI()
 
