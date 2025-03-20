@@ -10,9 +10,13 @@ pip install -r requirement.txt
 ```
 
 ## Run the virtual Python Environment
-If you using window run this command
+If you using Windows for activating venv, run this command:
 ```
 .\venv\Scripts\activate
+```
+Activate venv for macOS/Linux
+```
+source \venv\Scripts\activate
 ```
 
 ## Start the app
