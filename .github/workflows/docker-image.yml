@@ -49,4 +49,48 @@ jobs:
           
       - name: Image pushed
         run: echo "Docker image pushed to GHCR!"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Notify Jenkins
+        run: |
+          curl -X POST ${{ secrets.RASPBERRY_PI_IP }}/trigger-jenkins-rec
+          
+    outputs:
+        deploy_status: ${{ steps.deploy.outcome }}
+
+  notify:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        run: |
+          DEPLOY_STATUS="${{ needs.build.outputs.deploy_status }}"
+
+          if [ "$DEPLOY_STATUS" != "success" ]; then
+            STAGE="Deploy"
+            STATUS="failure"
+          else
+            STAGE="Deploy"
+            STATUS="success"
+          fi
+
+          MESSAGE=$(cat <<EOF
+          {
+            "username": "GitHub Actions",
+            "embeds": [{
+              "title": "Workflow $STATUS - $STAGE Stage",
+              "description": "Workflow: **${{ github.workflow }}**\\nActor: ${{ github.actor }}\nGithub-Commit-Head: ${{ github.sha }}\nBranch: **${{ github.ref_name }}**\\nRepository: **${{ github.repository }}**\\nCommit-msg: ${{ github.event.head_commit.message }}\nStatus: $STATUS\n[View Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+              "color": $(if [ "$STATUS" == "success" ]; then echo "3066993"; else echo "15158332"; fi)
+            }]
+          }
+          EOF
+          )
+
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "$MESSAGE" \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
         
